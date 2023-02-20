@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "datashield-opal"
+version = "0.1.0"
+description = ""
+authors = ["Yannick Marcon <yannick.marcon@obiba.org>"]
+maintainers = ["Yannick Marcon <yannick.marcon@obiba.org>"]
+license = "GPL-v3"
+readme = "README.md"
+homepage = "https://www.obiba.org"
+repository = "https://github.com/datashield/datashield-opal-python"
+documentation = "https://github.com/datashield/datashield-opal-python"
+packages = [{include = "datashield_opal"}]
+
+
+[tool.poetry.dependencies]
+python = "^3.7"
+obiba_opal = {git = "https://github.com/obiba/opal-python-client.git", rev = "master"}
+datashield = {git = "https://github.com/epigeny/datashield-python.git", rev = "master"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
