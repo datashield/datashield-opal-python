@@ -3,7 +3,7 @@ DataSHIELD Interface implementation for Opal.
 """
 
 from argparse import Namespace
-from obiba_opal.core import OpalClient, UriBuilder
+from obiba_opal.core import OpalClient, UriBuilder, OpalRequest, OpalResponse
 from datashield.interface import DSDriver, DSConnection, DSResult
 
 class OpalConnection(DSConnection):
@@ -67,17 +67,17 @@ class OpalConnection(DSConnection):
     if id_name is not None:
       builder.query('id', id_name)
     response = self._put(builder.build()).fail_on_error().send()
-    return OpalResult(self, rid = response.content) if asynchronous else OpalResult(self, result = response.from_json())
+    return OpalResult(self, rid = response.content) if asynchronous else OpalResult(self, result = None)
 
   def assign_resource(self, symbol: str, resource: str, asynchronous: bool = True) -> DSResult:
     builder = UriBuilder(['datashield', 'session', self._get_session_id(), 'symbol', symbol, 'resource', resource]).query('async', asynchronous)
     response = self._put(builder.build()).fail_on_error().send()
-    return OpalResult(self, rid = response.content) if asynchronous else OpalResult(self, result = response.from_json())
+    return OpalResult(self, rid = response.content) if asynchronous else OpalResult(self, result = None)
 
   def assign_expr(self, symbol: str, expr: str, asynchronous: bool = True) -> DSResult:
     builder = UriBuilder(['datashield', 'session', self._get_session_id(), 'symbol', symbol]).query('async', asynchronous)
     response = self._put(builder.build()).content_type_rscript().content(expr).fail_on_error().send()
-    return OpalResult(self, rid = response.content) if asynchronous else OpalResult(self, result = response.from_json())
+    return OpalResult(self, rid = response.content) if asynchronous else OpalResult(self, result = None)
 
   #
   # Aggregate
@@ -236,25 +236,25 @@ class OpalConnection(DSConnection):
         raise ValueError('DataSHIELD session creation failed: ' + response.code)
     return self.session
 
-  def _get(self, ws):
+  def _get(self, ws) -> OpalRequest:
     request = self.client.new_request()
     if self.verbose:
       request.verbose()
     return request.accept_json().get().resource(ws)
 
-  def _post(self, ws):
+  def _post(self, ws) -> OpalRequest:
     request = self.client.new_request()
     if self.verbose:
       request.verbose()
     return request.accept_json().post().resource(ws)
   
-  def _put(self, ws):
+  def _put(self, ws) -> OpalRequest:
     request = self.client.new_request()
     if self.verbose:
       request.verbose()
     return request.accept_json().put().resource(ws)
 
-  def _delete(self, ws):
+  def _delete(self, ws) -> OpalRequest:
     request = self.client.new_request()
     if self.verbose:
       request.verbose()
@@ -287,8 +287,7 @@ class OpalResult(DSResult):
     
   def fetch(self) -> any:
     if self.rid is None:
-      print(self.result)
-      return self.result
+      return self.result.from_json() if type(self.result) == OpalResponse else None
     else:
       # get the result of R command by its id
       builder = UriBuilder(['datashield', 'session', self.conn._get_session_id(), 'command', self.rid]).query('wait', True)
@@ -299,4 +298,4 @@ class OpalResult(DSResult):
         raise ValueError('Command %s failed on %s: %s' % (self.rid, self.conn.name, msg))
       builder = UriBuilder(['datashield', 'session', self.conn._get_session_id(), 'command', self.rid, 'result'])
       response = self.conn._get(builder.build()).send()
-      return response.from_json()
+      return response.from_json() if cmd['withResult'] else None
