@@ -264,7 +264,7 @@ class OpalDriver(DSDriver):
     
   @classmethod
   def new_connection(cls, name: str, args: dict, profile: str = 'default', restore: str = None) -> DSConnection:
-    namedArgs = Namespace(opal = args['url'], user = args['user'], password = args['password'], token = args['token'], otp = None)
+    namedArgs = Namespace(opal = args['url'], user = args['user'], password = args['password'], token = args['token'])
     loginInfo = OpalClient.LoginInfo.parse(namedArgs)
     return OpalConnection(name, loginInfo, profile, restore)
 
