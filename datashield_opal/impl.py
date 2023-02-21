@@ -86,7 +86,7 @@ class OpalConnection(DSConnection):
   def aggregate(self, expr: str, asynchronous: bool = True) -> DSResult:
     builder = UriBuilder(['datashield', 'session', self._get_session_id(), 'aggregate']).query('async', asynchronous)
     response = self._post(builder.build()).content_type_rscript().content(expr).fail_on_error().send()
-    return OpalResult(self, rid = response.content) if asynchronous else OpalResult(self, result = response.from_json())
+    return OpalResult(self, rid = response.content) if asynchronous else OpalResult(self, result = response)
 
   #
   # Symbols
