@@ -8,7 +8,7 @@ license = "GPL-v3"
 readme = "README.md"
 homepage = "https://www.obiba.org"
 repository = "https://github.com/datashield/datashield-opal-python"
-documentation = "https://github.com/datashield/datashield-opal-python"
+documentation = "https://datashield.github.io/datashield-opal-python"
 packages = [{include = "datashield_opal"}]
 
 

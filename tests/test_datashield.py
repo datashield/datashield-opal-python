@@ -1,4 +1,4 @@
-from datashield.interface import DSDriver
+from datashield.interface import DSDriver, DSError
 from datashield import DSLoginBuilder
 import time
 
@@ -8,7 +8,9 @@ class TestClass:
     @classmethod
     def setup_class(cls):
         driver = DSDriver.load_class('datashield_opal.OpalDriver')
-        builder = DSLoginBuilder().add('server1', 'https://opal-demo.obiba.org', 'dsuser', 'P@ssw0rd')
+        #url = 'http://localhost:8080'
+        url = 'https://opal-demo.obiba.org'
+        builder = DSLoginBuilder().add('server1', url, 'dsuser', 'P@ssw0rd')
         logins = builder.build()
         conn = driver.new_connection(logins[0]['name'], logins[0], profile = logins[0]['profile'])
         setattr(cls, 'conn', conn)
@@ -107,81 +109,114 @@ class TestClass:
         
     def test_assign_table(self):
         conn = self.conn
-        res = conn.assign_table('x', 'CNSIM.CNSIM1', asynchronous = False)
-        assert res.is_completed() == True
-        assert res.fetch() is None
-        symbols = conn.list_symbols()
-        assert type(symbols) == list
-        assert len(symbols) == 1
-        assert 'x' in symbols
+        try:
+            res = conn.assign_table('x', 'CNSIM.CNSIM1', asynchronous = False)
+            assert res.is_completed() == True
+            assert res.fetch() is None
+            symbols = conn.list_symbols()
+            assert type(symbols) == list
+            assert len(symbols) == 1
+            assert 'x' in symbols
 
-        res = conn.assign_table('y', 'CNSIM.CNSIM1', asynchronous = True)
-        self._do_wait(res)
-        assert res.fetch() is None
-        symbols = conn.list_symbols()
-        assert type(symbols) == list
-        assert len(symbols) == 2
-        assert 'y' in symbols
+            res = conn.assign_table('y', 'CNSIM.CNSIM1', asynchronous = True)
+            self._do_wait(res)
+            assert res.fetch() is None
+            symbols = conn.list_symbols()
+            assert type(symbols) == list
+            assert len(symbols) == 2
+            assert 'y' in symbols
 
-        conn.rm_symbol('x')
-        conn.rm_symbol('y')
-        symbols = conn.list_symbols()
-        assert type(symbols) == list
-        assert len(symbols) == 0
+            conn.rm_symbol('x')
+            conn.rm_symbol('y')
+            symbols = conn.list_symbols()
+            assert type(symbols) == list
+            assert len(symbols) == 0
+        except DSError as e:
+            print(e.get_error())
+            assert False
 
     def test_assign_resource(self):
         conn = self.conn
-        res = conn.assign_resource('x', 'RSRC.CNSIM1', asynchronous = False)
-        assert res.is_completed() == True
-        assert res.fetch() is None
-        symbols = conn.list_symbols()
-        assert type(symbols) == list
-        assert len(symbols) == 1
-        assert 'x' in symbols
+        try:
+            res = conn.assign_resource('x', 'RSRC.CNSIM1', asynchronous = False)
+            assert res.is_completed() == True
+            assert res.fetch() is None
+            symbols = conn.list_symbols()
+            assert type(symbols) == list
+            assert len(symbols) == 1
+            assert 'x' in symbols
 
-        res = conn.assign_resource('y', 'RSRC.CNSIM1', asynchronous = True)
-        self._do_wait(res)
-        assert res.fetch() is None
-        symbols = conn.list_symbols()
-        assert type(symbols) == list
-        assert len(symbols) == 2
-        assert 'y' in symbols
+            res = conn.assign_resource('y', 'RSRC.CNSIM1', asynchronous = True)
+            self._do_wait(res)
+            assert res.fetch() is None
+            symbols = conn.list_symbols()
+            assert type(symbols) == list
+            assert len(symbols) == 2
+            assert 'y' in symbols
 
-        conn.rm_symbol('x')
-        conn.rm_symbol('y')
-        symbols = conn.list_symbols()
-        assert type(symbols) == list
-        assert len(symbols) == 0
+            conn.rm_symbol('x')
+            conn.rm_symbol('y')
+            symbols = conn.list_symbols()
+            assert type(symbols) == list
+            assert len(symbols) == 0
 
+        except DSError as e:
+            print(e.get_error())
+            assert False
+        
     def test_aggregate(self):
         conn = self.conn
-        conn.assign_table('x', 'CNSIM.CNSIM1', asynchronous = False)
-        
-        # {
-        #    'EstimatedMean': 6.1241,
-        #    'Nmissing': 341,
-        #    'Nvalid': 1822,
-        #    'Ntotal': 2163,
-        #    'ValidityMessage': 'VALID ANALYSIS'
-        # }
-        res = conn.aggregate('meanDS(x$LAB_GLUC)', asynchronous = False)
-        mean = res.fetch()
-        assert type(mean) == dict
-        assert 'EstimatedMean' in mean
-        assert 'ValidityMessage' in mean
+        try:
+            conn.assign_table('x', 'CNSIM.CNSIM1', asynchronous = False)
+            
+            # {
+            #    'EstimatedMean': 6.1241,
+            #    'Nmissing': 341,
+            #    'Nvalid': 1822,
+            #    'Ntotal': 2163,
+            #    'ValidityMessage': 'VALID ANALYSIS'
+            # }
+            res = conn.aggregate('meanDS(x$LAB_GLUC)', asynchronous = False)
+            mean = res.fetch()
+            assert type(mean) == dict
+            assert 'EstimatedMean' in mean
+            assert 'ValidityMessage' in mean
 
-        res = conn.aggregate('meanDS(x$LAB_GLUC)', asynchronous = True)
-        self._do_wait(res)
-        mean = res.fetch()
-        assert type(mean) == dict
-        assert 'EstimatedMean' in mean
-        assert 'ValidityMessage' in mean
+            res = conn.aggregate('meanDS(x$LAB_GLUC)', asynchronous = True)
+            self._do_wait(res)
+            mean = res.fetch()
+            assert type(mean) == dict
+            assert 'EstimatedMean' in mean
+            assert 'ValidityMessage' in mean
+
+        except DSError as e:
+            print(e.get_error())
+            assert False
+
+    def test_aggregate_function_not_allowed(self):
+        conn = self.conn
+        try:
+            res = conn.aggregate('myfunc(x$LAB_GLUC)', asynchronous = False)
+            assert False
+        except DSError as e:
+            print(e.get_error())
+            assert True
+        
+        try:
+            res = conn.aggregate('myfunc(x$LAB_GLUC)', asynchronous = True)
+            self._do_wait(res)
+            value = res.fetch()
+            print(value)
+            assert False
+        except DSError as e:
+            print(e.get_error())
+            assert True
 
 
     def _do_wait(self, res, secs = 10):
         count = 0
         while not res.is_completed():
-            time.spleep(0.1)
+            time.sleep(0.1)
             count = count + 1
-            if secs < 10 * count:
-                raise Exception('Result completion timeout')
+            if secs < 0.1 * count:
+                raise Exception(f'Result completion timeout: {0.1 * count}s')
