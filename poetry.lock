@@ -131,19 +131,15 @@ version = "5.2.0"
 description = "OBiBa/Opal python client."
 category = "main"
 optional = false
-python-versions = "^3.7"
-files = []
-develop = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "obiba_opal-5.2.0-py3-none-any.whl", hash = "sha256:c2d52d26080b52999b39c78ed3edc983a58ea87841c72ef50548d68196ea5c97"},
+    {file = "obiba_opal-5.2.0.tar.gz", hash = "sha256:9c54c8d6b84c98d2e3c4cf00fb38a00ead448015602729f3fce4f1f34ea28337"},
+]
 
 [package.dependencies]
-requests = "^2.31.0"
+requests = ">=2.31.0,<3.0.0"
 urllib3 = "1.26.15"
-
-[package.source]
-type = "git"
-url = "https://github.com/obiba/opal-python-client.git"
-reference = "master"
-resolved_reference = "39604e0e3151993d312fd516634d2f83c47cc30e"
 
 [[package]]
 name = "requests"
@@ -187,4 +183,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7"
-content-hash = "172adfb88eccb1977ce0abd3609b520ceb0588d93ba74369e943dfa7014c3c2e"
+content-hash = "d462d11df769237e97ab6953f6d6249028febc7eb41e55e5b80bd09b84fa040b"

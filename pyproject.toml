@@ -14,7 +14,7 @@ packages = [{include = "datashield_opal"}]
 
 [tool.poetry.dependencies]
 python = "^3.7"
-obiba_opal = {git = "https://github.com/obiba/opal-python-client.git", rev = "master"}
+obiba_opal = "^5.2.0"
 datashield = {git = "https://github.com/epigeny/datashield-python.git", rev = "master"}
 
 
