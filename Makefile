@@ -4,6 +4,12 @@ install:
 test:
 	poetry run pytest
 
+test-api-admin:
+	poetry run pytest tests/test_api_admin.py
+
+test-api-analysis:
+	poetry run pytest tests/test_api_analysis.py
+
 build:
 	poetry build
 

@@ -1,5 +1,4 @@
-from datashield.interface import DSDriver, DSError
-from datashield import DSLoginBuilder
+from datashield import DSError, DSLoginBuilder, DSSession
 import time
 
 
@@ -7,17 +6,20 @@ class TestClass:
 
     @classmethod
     def setup_class(cls):
-        driver = DSDriver.load_class('datashield_opal.OpalDriver')
         #url = 'http://localhost:8080'
         url = 'https://opal-demo.obiba.org'
         builder = DSLoginBuilder().add('server1', url, 'dsuser', 'P@ssw0rd')
         logins = builder.build()
-        conn = driver.new_connection(logins[0]['name'], logins[0], profile = logins[0]['profile'])
-        setattr(cls, 'conn', conn)
+        session = DSSession(logins)
+        session.open()
+        print(session.has_errors())
+        print(session.has_connections())
+        setattr(cls, 'session', session)
+        setattr(cls, 'conn', session.conns[0])
 
     @classmethod
     def teardown_class(cls):
-        cls.conn.disconnect()    
+        cls.session.close()
 
     def test_driver(self):
         conn = self.conn

@@ -4,7 +4,7 @@ DataSHIELD Interface implementation for Opal.
 
 from argparse import Namespace
 from obiba_opal.core import OpalClient, UriBuilder, OpalRequest, OpalResponse, HTTPError
-from datashield.interface import DSDriver, DSConnection, DSResult, DSError
+from datashield.interface import DSLoginInfo, DSDriver, DSConnection, DSResult, DSError
 
 
 class OpalDSError(DSError):
@@ -291,12 +291,10 @@ class OpalConnection(DSConnection):
 class OpalDriver(DSDriver):
 
     @classmethod
-    def new_connection(cls, name: str, args: dict, profile: str = 'default', restore: str = None) -> DSConnection:
-        namedArgs = Namespace(opal = args['url'], user = args['user'], password = args['password'], token = args['token'])
+    def new_connection(cls, args: DSLoginInfo, restore: str = None) -> DSConnection:
+        namedArgs = Namespace(opal = args.url, user = args.user, password = args.password, token = args.token)
         loginInfo = OpalClient.LoginInfo.parse(namedArgs)
-        return OpalConnection(name, loginInfo, profile, restore)
-
-
+        return OpalConnection(args.name, loginInfo, args.profile, restore)
 
 class OpalResult(DSResult):
 
