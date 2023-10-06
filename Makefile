@@ -13,6 +13,9 @@ test-api-analysis:
 build:
 	poetry build
 
+publish:
+	poetry publish --build
+
 clean:
 	rm -rf dist
 
