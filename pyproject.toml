@@ -23,8 +23,8 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "datashield>=0.1.0",
-    "obiba_opal>=5.3.0"
+    "datashield @ git+https://github.com/datashield/datashield-python.git@master",
+    "obiba_opal @ git+https://github.com/obiba/opal-python-client.git@master"
 ]
 
 [project.optional-dependencies]
@@ -45,6 +45,9 @@ Documentation = "https://datashield.github.io/datashield-opal-python"
 markers = [
     "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
 ]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [build-system]
 requires = ["hatchling"]
