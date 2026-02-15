@@ -1,3 +1,4 @@
+import pytest
 from datashield import DSSession, DSLoginBuilder, DSError
 
 
@@ -13,6 +14,7 @@ class TestClass:
     def teardown_method(self, method):
         self.session.close()
 
+    @pytest.mark.integration
     def test_assign_tables(self):
         try:
             self.session.assign_table(
@@ -28,6 +30,7 @@ class TestClass:
             print(self.session.get_errors())
             raise ValueError("Failed to assign tables") from e
 
+    @pytest.mark.integration
     def test_assign_table(self):
         try:
             self.session.assign_table("df", table="CNSIM.CNSIM1", asynchronous=False)
@@ -41,6 +44,7 @@ class TestClass:
             print(self.session.get_errors())
             raise ValueError("Failed to assign table") from e
 
+    @pytest.mark.integration
     def test_assign_resources(self):
         try:
             self.session.assign_resource(
@@ -64,6 +68,7 @@ class TestClass:
             print(self.session.get_errors())
             raise ValueError("Failed to assign resources") from e
 
+    @pytest.mark.integration
     def test_assign_resource(self):
         try:
             self.session.assign_resource("client", resource="RSRC.CNSIM1", asynchronous=False)

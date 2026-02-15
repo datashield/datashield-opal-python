@@ -22,7 +22,7 @@ clean:
 	rm -rf dist
 
 local-install: clean build
-	pip install ./dist/datashield-*.tar.gz
+	pip install ./dist/datashield_opal-*.tar.gz
 
 local-install-force: clean build
-	pip install ./dist/datashield-*.tar.gz --break-system-packages
+	pip install ./dist/datashield_opal-*.tar.gz --break-system-packages

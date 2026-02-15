@@ -88,7 +88,8 @@ class OpalConnection(DSConnection):
             .query("async", asynchronous)
         )
         if variables is not None:
-            builder.query("variables", f'name.any("{",".join(variables)}")')
+            vars = ",".join([f'"{v}"' for v in variables])
+            builder.query("variables", f"name.any({vars})")
         if identifiers is not None:
             builder.query("identifiers", identifiers)
         if id_name is not None:
@@ -191,8 +192,8 @@ class OpalConnection(DSConnection):
         def format_method(x):
             return f"{x['pkg']}:{x['version']}" if "pkg" in x and "version" in x else None
 
-        aggregate = [format_method(x) for x in aggregate if "pkg" in x]
-        assign = [format_method(x) for x in assign if "pkg" in x]
+        aggregate = [x for x in [format_method(x) for x in aggregate] if x is not None]
+        assign = [x for x in [format_method(x) for x in assign] if x is not None]
 
         # unique values
         pkgs = list(set(aggregate + assign))
@@ -240,7 +241,7 @@ class OpalConnection(DSConnection):
     def is_async(self) -> dict:
         return {"aggregate": True, "assign_table": True, "assign_resource": True, "assign_expr": True}
 
-    def keep_alive(self) -> bool:
+    def keep_alive(self) -> None:
         with suppress(Exception):
             self.list_symbols()
 
@@ -279,7 +280,7 @@ class OpalConnection(DSConnection):
             if response.code == 201:
                 self.session = response.from_json()
             else:
-                raise OpalDSError(ValueError("DataSHIELD session creation failed: " + response.code))
+                raise OpalDSError(ValueError(f"DataSHIELD session creation failed: {response.code}"))
         return self.session
 
     def _get(self, ws) -> OpalRequest:

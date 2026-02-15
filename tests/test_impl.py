@@ -21,15 +21,18 @@ class TestClass:
     def teardown_class(cls):
         cls.session.close()
 
+    @pytest.mark.integration
     def test_driver(self):
         conn = self.conn
         assert conn.name == "server1"
 
+    @pytest.mark.integration
     def test_workspaces(self):
         conn = self.conn
         workspaces = conn.list_workspaces()
         assert type(workspaces) is list
 
+    @pytest.mark.integration
     def test_profiles(self):
         conn = self.conn
         profiles = conn.list_profiles()
@@ -39,6 +42,7 @@ class TestClass:
         assert type(profiles["available"]) is list
         assert profiles["current"] == "default"
 
+    @pytest.mark.integration
     def test_methods(self):
         conn = self.conn
         methods = conn.list_methods(type="assign")
@@ -62,6 +66,7 @@ class TestClass:
         names = [x["name"] for x in methods]
         assert "meanDS" in names
 
+    @pytest.mark.integration
     def test_packages(self):
         conn = self.conn
         pkgs = conn.list_packages()
@@ -72,6 +77,7 @@ class TestClass:
         assert "resourcer" in names
         assert "dsBase" in names
 
+    @pytest.mark.integration
     def test_tables(self):
         conn = self.conn
         tables = conn.list_tables()
@@ -79,6 +85,7 @@ class TestClass:
         assert "CNSIM.CNSIM1" in tables
         assert conn.has_table("CNSIM.CNSIM1")
 
+    @pytest.mark.integration
     def test_resources(self):
         conn = self.conn
         resources = conn.list_resources()
@@ -86,6 +93,7 @@ class TestClass:
         assert "RSRC.CNSIM1" in resources
         assert conn.has_resource("RSRC.CNSIM1")
 
+    @pytest.mark.integration
     def test_assign_expr(self):
         conn = self.conn
         res = conn.assign_expr("x", "c(1, 2, 3)", asynchronous=False)
@@ -110,6 +118,7 @@ class TestClass:
         assert type(symbols) is list
         assert len(symbols) == 0
 
+    @pytest.mark.integration
     def test_assign_table(self):
         conn = self.conn
         try:
@@ -138,6 +147,7 @@ class TestClass:
             print(e.get_error())
             raise ValueError("Assign table test failed") from e
 
+    @pytest.mark.integration
     def test_assign_resource(self):
         conn = self.conn
         try:
@@ -167,6 +177,7 @@ class TestClass:
             print(e.get_error())
             raise ValueError("Assign resource test failed") from e
 
+    @pytest.mark.integration
     def test_aggregate(self):
         conn = self.conn
         try:
@@ -196,6 +207,7 @@ class TestClass:
             print(e.get_error())
             raise ValueError("Aggregate test failed") from e
 
+    @pytest.mark.integration
     def test_aggregate_function_not_allowed(self):
         conn = self.conn
         with pytest.raises(DSError) as exc_info:

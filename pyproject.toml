@@ -41,9 +41,14 @@ Repository = "https://github.com/datashield/datashield-opal-python"
 Documentation = "https://datashield.github.io/datashield-opal-python"
 "Bug Tracker" = "https://github.com/datashield/datashield-opal-python/issues"
 
+[tool.pytest.ini_options]
+markers = [
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["datashield"]
+packages = ["datashield_opal"]
