@@ -1,23 +1,28 @@
 install:
-	poetry install
+	uv sync --all-extras
 
 test:
-	poetry run pytest
+	uv run --all-extras pytest
 
-test-api-admin:
-	poetry run pytest tests/test_api_admin.py
+lint:
+	uv run ruff check .
 
-test-api-analysis:
-	poetry run pytest tests/test_api_analysis.py
+fix:
+	uv run ruff check . --fix
+
+format:
+	uv run ruff format .
+
+check: format fix
 
 build:
-	poetry build
-
-publish:
-	poetry publish --build
+	uv build
 
 clean:
 	rm -rf dist
 
-local-install:
-	pip install ./dist/datashield_opal-*.tar.gz 
+local-install: clean build
+	pip install ./dist/datashield_opal-*.tar.gz
+
+local-install-force: clean build
+	pip install ./dist/datashield_opal-*.tar.gz --break-system-packages

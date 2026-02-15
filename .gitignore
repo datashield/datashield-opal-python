@@ -27,4 +27,11 @@ coverage
 *.sln
 *.sw?
 
+# VSCode
+.history
 __pycache__
+
+debug.py
+.serena/
+plans/
+.venv/
