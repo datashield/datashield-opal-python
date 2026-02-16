@@ -5,7 +5,7 @@ DataSHIELD Interface implementation for Opal.
 from argparse import Namespace
 from contextlib import suppress
 from obiba_opal.core import OpalClient, UriBuilder, OpalRequest, OpalResponse, HTTPError
-from datashield.interface import DSLoginInfo, DSDriver, DSConnection, DSResult, DSError
+from datashield.interface import DSLoginInfo, DSDriver, DSConnection, DSResult, DSError, RSession
 
 
 class OpalDSError(DSError):
@@ -23,6 +23,97 @@ class OpalDSError(DSError):
         return isinstance(self.exception, HTTPError) and self.exception.code >= 500
 
 
+class OpalRSession(RSession):
+    def __init__(self, client: OpalClient, profile: str = None, restore: str = None, verbose: bool = False):
+        self.client = client
+        self.profile = profile
+        self.restore = restore
+        self.verbose = verbose
+        self.id = None
+
+    def get_id(self) -> str:
+        if self.id is None:
+            self.start(False)
+        return self.id
+
+    def start(self, asynchronous: bool = True) -> None:
+        builder = UriBuilder(["datashield", "sessions"]).query("wait", not asynchronous)
+        if self.profile is not None:
+            builder.query("profile", self.profile)
+        if self.restore is not None:
+            builder.query("restore", self.restore)
+        response = self._post(builder.build()).send()
+        if response.code != 201:
+            raise OpalDSError(ValueError(f"Failed to start R session: {response.code}"))
+        session = response.from_json()
+        if "id" not in session:
+            raise OpalDSError(ValueError("Failed to start R session: no session id returned"))
+        self.id = session["id"]
+
+    def is_ready(self) -> bool:
+        if self.id is None:
+            raise OpalDSError(ValueError("R session not started"))
+        response = self._get(UriBuilder(["datashield", "session", self.id]).build()).send()
+        if response.code != 200:
+            raise OpalDSError(ValueError(f"Failed to check R session status: {response.code}"))
+        session = response.from_json()
+        return session.get("state", "").lower() == "running"
+
+    def is_pending(self) -> bool:
+        if self.id is None:
+            raise OpalDSError(ValueError("R session not started"))
+        response = self._get(UriBuilder(["datashield", "session", self.id]).build()).send()
+        if response.code != 200:
+            raise OpalDSError(ValueError(f"Failed to check R session status: {response.code}"))
+        session = response.from_json()
+        return session.get("state", "").lower() == "pending"
+
+    def is_failed(self) -> bool:
+        if self.id is None:
+            raise OpalDSError(ValueError("R session not started"))
+        response = self._get(UriBuilder(["datashield", "session", self.id]).build()).send()
+        if response.code != 200:
+            raise OpalDSError(ValueError(f"Failed to check R session status: {response.code}"))
+        session = response.from_json()
+        return session.get("state", "").lower() == "failed"
+
+    def get_state_message(self) -> str:
+        if self.id is None:
+            raise OpalDSError(ValueError("R session not started"))
+        response = self._get(UriBuilder(["datashield", "session", self.id]).build()).send()
+        if response.code != 200:
+            raise OpalDSError(ValueError(f"Failed to check R session status: {response.code}"))
+        session = response.from_json()
+        events = session.get("events", [])
+        if events:
+            return events[-1]
+        return "No recent events"
+
+    def close(self) -> None:
+        if self.id is not None:
+            builder = UriBuilder(["datashield", "session", self.id])
+            self._delete(builder.build()).send()
+            self.id = None
+
+    def _post(self, ws: str) -> OpalRequest:
+        request = self.client.new_request()
+        if self.verbose:
+            request.verbose()
+        return request.accept_json().post().resource(ws)
+
+    def _get(self, ws: str) -> OpalRequest:
+        request = self.client.new_request()
+        if self.verbose:
+            request.verbose()
+        return request.accept_json().get().resource(ws)
+
+    def _delete(self, ws: str) -> OpalRequest:
+        request = self.client.new_request()
+        if self.verbose:
+            request.verbose()
+        return request.accept_json().delete().resource(ws)
+
+
 class OpalConnection(DSConnection):
     def __init__(self, name: str, loginInfo: OpalClient.LoginInfo, profile: str = "default", restore: str = None):
         self.name = name
@@ -30,8 +121,8 @@ class OpalConnection(DSConnection):
         self.subject = None
         self.profile = profile
         self.restore = restore
-        self.session = None
         self.verbose = False
+        self.rsession = None
 
     #
     # Content listing
@@ -67,6 +158,25 @@ class OpalConnection(DSConnection):
         parts = name.split(".")
         response = self._get(UriBuilder(["project", parts[0], "resource", parts[1]]).build()).send()
         return response.code == 200
+
+    #
+    # R Session (server side)
+    #
+
+    def has_session(self) -> bool:
+        return self.rsession is not None
+
+    def start_session(self, asynchronous: bool = True) -> RSession:
+        if self.rsession is not None:
+            return self.rsession
+        self.rsession = OpalRSession(self.client, profile=self.profile, restore=self.restore, verbose=self.verbose)
+        self.rsession.start(asynchronous=asynchronous)
+        return self.rsession
+
+    def get_session(self) -> RSession:
+        if self.rsession is None:
+            raise OpalDSError(ValueError("No R session established. Please start a session first."))
+        return self.rsession
 
     #
     # Assign
@@ -249,10 +359,8 @@ class OpalConnection(DSConnection):
         """
         Close DataSHIELD session, and then Opal session.
         """
-        if self.session is not None:
-            builder = UriBuilder(["datashield", "session", self._get_session_id()])
-            self._delete(builder.build()).send()
-            self.session = None
+        if self.rsession is not None:
+            self.rsession.close()
         self.client.close()
 
     #
@@ -267,21 +375,8 @@ class OpalConnection(DSConnection):
         return self.subject
 
     def _get_session_id(self) -> str:
-        return self._get_session()["id"]
-
-    def _get_session(self):
-        if self.session is None:
-            builder = UriBuilder(["datashield", "sessions"])
-            if self.profile is not None:
-                builder.query("profile", self.profile)
-            if self.restore is not None:
-                builder.query("restore", self.restore)
-            response = self._post(builder.build()).send()
-            if response.code == 201:
-                self.session = response.from_json()
-            else:
-                raise OpalDSError(ValueError(f"DataSHIELD session creation failed: {response.code}"))
-        return self.session
+        self.start_session(asynchronous=False)
+        return self.rsession.get_id()
 
     def _get(self, ws) -> OpalRequest:
         request = self.client.new_request()

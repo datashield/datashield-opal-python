@@ -23,7 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "datashield @ git+https://github.com/datashield/datashield-python.git@master",
+    "datashield @ git+https://github.com/datashield/datashield-python.git@feat/sessions",
     "obiba_opal @ git+https://github.com/obiba/opal-python-client.git@master"
 ]
 
@@ -33,6 +33,8 @@ test = [
 ]
 dev = [
     "ruff>=0.10.0",
+    "matplotlib>=3.10.8",
+    "pandas>=2.3.3",
 ]
 
 [project.urls]
@@ -55,3 +57,7 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["datashield_opal"]
+exclude = [
+    "examples/",
+    "tests/",
+]
