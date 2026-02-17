@@ -50,6 +50,9 @@ class OpalRSession(RSession):
             raise OpalDSError(ValueError("Failed to start R session: no session id returned"))
         self.id = session["id"]
 
+    def is_started(self) -> bool:
+        return self.id is not None
+
     def is_ready(self) -> bool:
         if self.id is None:
             raise OpalDSError(ValueError("R session not started"))
@@ -77,16 +80,30 @@ class OpalRSession(RSession):
         session = response.from_json()
         return session.get("state", "").lower() == "failed"
 
-    def get_state_message(self) -> str:
+    def is_terminated(self) -> bool:
         if self.id is None:
             raise OpalDSError(ValueError("R session not started"))
         response = self._get(UriBuilder(["datashield", "session", self.id]).build()).send()
         if response.code != 200:
             raise OpalDSError(ValueError(f"Failed to check R session status: {response.code}"))
         session = response.from_json()
-        events = session.get("events", [])
-        if events:
-            return events[-1]
+        return session.get("state", "").lower() == "terminated"
+
+    def get_events(self) -> list:
+        if self.id is None:
+            raise OpalDSError(ValueError("R session not started"))
+        response = self._get(UriBuilder(["datashield", "session", self.id]).build()).send()
+        if response.code != 200:
+            raise OpalDSError(ValueError(f"Failed to retrieve R session events: {response.code}"))
+        session = response.from_json()
+        events = [evt.split(";") for evt in session.get("events", [])]
+        return events
+
+    def get_last_message(self) -> str:
+        events = self.get_events()
+        if events and len(events) > 0:
+            last_event = events[-1]
+            return last_event[2] if len(last_event) > 2 else "No message"
         return "No recent events"
 
     def close(self) -> None:
