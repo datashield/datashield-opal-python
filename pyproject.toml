@@ -23,7 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "datashield @ git+https://github.com/datashield/datashield-python.git@feat/sessions",
+    "datashield>=0.2.0",
     "obiba_opal @ git+https://github.com/obiba/opal-python-client.git@master"
 ]
 

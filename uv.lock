@@ -310,8 +310,12 @@ wheels = [
 
 [[package]]
 name = "datashield"
-version = "1.0.0"
-source = { git = "https://github.com/datashield/datashield-python.git?rev=feat%2Fsessions#596d762a8516e2fd8a7543170e3b70423ac0c077" }
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/23/c6/55607d586a930a9ecf8ed16cfe1d70bffd54d97a6afc5c1280df3c8f6116/datashield-0.2.0.tar.gz", hash = "sha256:72a6f9642e6c3242cad1a7892c48f8bb5ee6995ef0549032e9e764af50fe575f", size = 29020, upload-time = "2026-02-17T17:02:39.065Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ca/e7/69bfb5e8104431a45454cfb4ddc8149ce17c7509665a77b490757f6005fb/datashield-0.2.0-py3-none-any.whl", hash = "sha256:ce15bb3cfcb323973ce4b0e16b9ee5d42ca3de47af8becd61e1271985bf5da8c", size = 19003, upload-time = "2026-02-17T17:02:39.737Z" },
+]
 
 [[package]]
 name = "datashield-opal"
@@ -335,7 +339,7 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "datashield", git = "https://github.com/datashield/datashield-python.git?rev=feat%2Fsessions" },
+    { name = "datashield", specifier = ">=0.2.0" },
     { name = "matplotlib", marker = "extra == 'dev'", specifier = ">=3.10.8" },
     { name = "obiba-opal", git = "https://github.com/obiba/opal-python-client.git?rev=master" },
     { name = "pandas", marker = "extra == 'dev'", specifier = ">=2.3.3" },

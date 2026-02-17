@@ -140,6 +140,7 @@ class OpalConnection(DSConnection):
         self.restore = restore
         self.verbose = False
         self.rsession = None
+        self.rsession_started = False
 
     #
     # Content listing
@@ -188,7 +189,16 @@ class OpalConnection(DSConnection):
             return self.rsession
         self.rsession = OpalRSession(self.client, profile=self.profile, restore=self.restore, verbose=self.verbose)
         self.rsession.start(asynchronous=asynchronous)
+        self.rsession_started = not asynchronous or not self.rsession.is_pending()
         return self.rsession
+    
+    def is_session_started(self) -> bool:
+        if self.rsession is None:
+            return False
+        if self.rsession_started:
+            return True
+        self.rsession_started = not self.rsession.is_pending()
+        return self.rsession_started
 
     def get_session(self) -> RSession:
         if self.rsession is None:
