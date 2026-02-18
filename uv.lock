@@ -319,7 +319,7 @@ wheels = [
 
 [[package]]
 name = "datashield-opal"
-version = "1.0.0"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "datashield" },
@@ -341,7 +341,7 @@ test = [
 requires-dist = [
     { name = "datashield", specifier = ">=0.2.0" },
     { name = "matplotlib", marker = "extra == 'dev'", specifier = ">=3.10.8" },
-    { name = "obiba-opal", git = "https://github.com/obiba/opal-python-client.git?rev=master" },
+    { name = "obiba-opal", specifier = ">=6.0.2" },
     { name = "pandas", marker = "extra == 'dev'", specifier = ">=2.3.3" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=7.2.2" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.10.0" },
@@ -793,12 +793,16 @@ wheels = [
 
 [[package]]
 name = "obiba-opal"
-version = "6.0.0"
-source = { git = "https://github.com/obiba/opal-python-client.git?rev=master#181169932656fd0afeef7051750e6b7338847c21" }
+version = "6.0.2"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "requests" },
     { name = "typer" },
     { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0c/42/89cac16266502d501355523692fd1d872ffb85185661eabcb740acd90e83/obiba_opal-6.0.2.tar.gz", hash = "sha256:e66b28119d9eeef5217aca96450811592a86dc9519f455ecd7aa7c7639b06fda", size = 124112, upload-time = "2026-02-18T10:08:30.149Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/75/b1/a7b653911eeb8e3f44a18e138b2095fd7f93a7b691243b003d215ac6f615/obiba_opal-6.0.2-py3-none-any.whl", hash = "sha256:41c714a3612f81c52b42a8ebf038d876672bf6c7da48ad653466d9b81b397eb3", size = 73491, upload-time = "2026-02-18T10:08:31.526Z" },
 ]
 
 [[package]]
