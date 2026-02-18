@@ -1,6 +1,6 @@
 [project]
 name = "datashield-opal"
-version = "1.0.0"
+version = "0.2.0"
 description = ""
 authors = [
     {name = "Yannick Marcon", email = "yannick.marcon@obiba.org"}
@@ -23,8 +23,8 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "datashield @ git+https://github.com/datashield/datashield-python.git@master",
-    "obiba_opal @ git+https://github.com/obiba/opal-python-client.git@master"
+    "datashield>=0.2.0",
+    "obiba_opal>=6.0.2"
 ]
 
 [project.optional-dependencies]
@@ -33,6 +33,8 @@ test = [
 ]
 dev = [
     "ruff>=0.10.0",
+    "matplotlib>=3.10.8",
+    "pandas>=2.3.3",
 ]
 
 [project.urls]
@@ -55,3 +57,7 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["datashield_opal"]
+exclude = [
+    "examples/",
+    "tests/",
+]

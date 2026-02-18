@@ -48,7 +48,7 @@ class TestClass:
     def test_assign_resources(self):
         try:
             self.session.assign_resource(
-                "client", resources={"server1": "RSRC.CNSIM1", "server2": "RSRC.CNSIM1"}, asynchronous=False
+                "client", resources={"server1": "RSRC.CNSIM1", "server2": "RSRC.CNSIM2"}, asynchronous=False
             )
             rval = self.session.ls()
             assert len(rval) == 2
