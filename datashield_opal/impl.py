@@ -142,6 +142,14 @@ class OpalConnection(DSConnection):
         self.rsession = None
         self.rsession_started = False
 
+    def check_user(self) -> bool:
+        """Check if the user can authenticate by trying to retrieve the current subject profile."""
+        try:
+            self._get("/system/subject-profile/_current").fail_on_error().send()
+            return True
+        except Exception:
+            return False
+
     #
     # Content listing
     #
@@ -191,7 +199,7 @@ class OpalConnection(DSConnection):
         self.rsession.start(asynchronous=asynchronous)
         self.rsession_started = not asynchronous or not self.rsession.is_pending()
         return self.rsession
-    
+
     def is_session_started(self) -> bool:
         if self.rsession is None:
             return False
@@ -435,7 +443,11 @@ class OpalDriver(DSDriver):
     def new_connection(cls, args: DSLoginInfo, restore: str = None) -> DSConnection:
         namedArgs = Namespace(opal=args.url, user=args.user, password=args.password, token=args.token)
         loginInfo = OpalClient.LoginInfo.parse(namedArgs)
-        return OpalConnection(args.name, loginInfo, args.profile, restore)
+        conn = OpalConnection(args.name, loginInfo, args.profile, restore)
+        if not conn.check_user():
+            creds = f"user {args.user}" if args.user else "token"
+            raise OpalDSError(ValueError(f"Failed to authenticate on {args.url} with {creds}"))
+        return conn
 
 
 class OpalResult(DSResult):
