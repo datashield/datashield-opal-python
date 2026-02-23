@@ -320,7 +320,7 @@ wheels = [
 [[package]]
 name = "datashield"
 version = "0.4.0"
-source = { git = "https://github.com/datashield/datashield-python.git?rev=catalog#ae1d40c581dde82b0aefcb0549b7322185a9aa6a" }
+source = { git = "https://github.com/datashield/datashield-python.git?rev=catalog#ece58d162c8c669d20ad78b575b2604c85d7dd51" }
 dependencies = [
     { name = "pydantic" },
     { name = "pyyaml" },

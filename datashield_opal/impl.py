@@ -188,7 +188,7 @@ class OpalConnection(DSConnection):
     def list_taxonomies(self) -> list:
         return self._get(UriBuilder(["system", "conf", "taxonomies"]).build()).fail_on_error().send().from_json()
 
-    def search_variables(self, query) -> list:
+    def search_variables(self, query) -> dict:
         return (
             self
             ._get(UriBuilder(["datasources", "variables", "_search"]).query("query", query).build())
