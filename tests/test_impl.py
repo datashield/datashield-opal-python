@@ -86,6 +86,13 @@ class TestClass:
         assert conn.has_table("CNSIM.CNSIM1")
 
     @pytest.mark.integration
+    def test_table_variables(self):
+        conn = self.conn
+        variables = conn.list_table_variables("CNSIM.CNSIM1")
+        assert type(variables) is list
+        assert "LAB_TSC" in [v.get("name") for v in variables]
+
+    @pytest.mark.integration
     def test_resources(self):
         conn = self.conn
         resources = conn.list_resources()
