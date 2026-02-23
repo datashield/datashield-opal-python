@@ -1,6 +1,6 @@
 [project]
 name = "datashield-opal"
-version = "0.2.0"
+version = "0.3.0"
 description = ""
 authors = [
     {name = "Yannick Marcon", email = "yannick.marcon@obiba.org"}
@@ -23,7 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "datashield>=0.2.0",
+    "datashield @ git+https://github.com/datashield/datashield-python.git@catalog",
     "obiba_opal>=6.0.2"
 ]
 
