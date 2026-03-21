@@ -20,7 +20,7 @@ logins = builder.build()
 session = DSSession(logins)
 session.open()
 
-# do some DataSHIELD analysis stuff
+# do some DataSHIELD analysis stuff, see examples folder
 
 session.close()
 ```
