@@ -142,7 +142,7 @@ class OpalConnection(DSConnection):
         self.rsession = None
         self.rsession_started = False
 
-    def get_name(self):
+    def get_name(self) -> str:
         """Get the name of the connection."""
         return self.name
 
@@ -169,11 +169,17 @@ class OpalConnection(DSConnection):
         return names
 
     def has_table(self, name: str) -> bool:
+        # name is in format "datasource.table"
+        if "." not in name:
+            raise OpalDSError(ValueError(f"Invalid table name: {name}. Expected format 'datasource.table'"))
         parts = name.split(".")
         response = self._get(UriBuilder(["datasource", parts[0], "table", parts[1]]).build()).send()
         return response.code == 200
 
     def list_table_variables(self, table) -> list:
+        # table is in format "datasource.table"
+        if "." not in table:
+            raise OpalDSError(ValueError(f"Invalid table name: {table}. Expected format 'datasource.table'"))
         tokens = table.split(".")
         project_name = tokens[0]
         table_name = tokens[1]
@@ -209,6 +215,8 @@ class OpalConnection(DSConnection):
         return names
 
     def has_resource(self, name: str) -> bool:
+        if "." not in name:
+            raise OpalDSError(ValueError(f"Invalid resource name: {name}. Expected format 'project.resource'"))
         parts = name.split(".")
         response = self._get(UriBuilder(["project", parts[0], "resource", parts[1]]).build()).send()
         return response.code == 200
