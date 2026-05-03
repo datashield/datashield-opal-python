@@ -1,6 +1,9 @@
-# datashield-opal-python
+# DataSHIELD Opal Python
 
-DataSHIELD Client Interface implementation for OBiBa/Opal
+[![GitHub Actions](https://github.com/datashield/datashield-opal-python/actions/workflows/ci.yml/badge.svg)](https://github.com/datashield/datashield-opal-python/actions)
+[![PyPI version](https://img.shields.io/pypi/v/datashield-opal.svg)](https://pypi.org/project/datashield-opal/)
+
+[DataSHIELD Python API](https://github.com/datashield/datashield-python) implementation for [OBiBa/Opal](https://www.obiba.org/pages/products/opal/).
 
 ## Installation
 
